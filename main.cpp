@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <iostream>
 #include <limits>
 constexpr char codigos[][5] = {
@@ -72,9 +73,10 @@ int main() {
 
 void codificarMorse() {
     std::string texto;
-    std::cout << "Texto a codificar(somente Maiúsculas): ";
+    std::cout << "Texto a codificar: ";
     std::cin.ignore(); // Limpa o buffer de entrada
     std::getline(std::cin, texto);
+    std::ranges::transform(texto, texto.begin(), ::toupper);
     std::cout << "Texto codificado em Morse: ";
     for (const char c: texto) {
         if (c >= 'A' && c <= 'Z') {
