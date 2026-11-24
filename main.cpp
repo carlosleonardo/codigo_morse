@@ -1,6 +1,11 @@
 #include <algorithm>
 #include <iostream>
 #include <limits>
+
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 constexpr char codigos[][5] = {
     ".-", // A
     "-...", // B
@@ -30,12 +35,18 @@ constexpr char codigos[][5] = {
     "--.." // Z
 };
 
-void codificarMorse();
+namespace  {
+    void codificarMorse();
 
-void decodificarMorse();
+    void decodificarMorse();
+}
 
 int main() {
-    setlocale(LC_ALL, "pt_BR.utf8");
+#ifdef _WIN32
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+#endif
+
     std::cout << "Código Morse!" << std::endl;
     bool sair = false;
 
@@ -71,49 +82,51 @@ int main() {
     return 0;
 }
 
-void codificarMorse() {
-    std::string texto;
-    std::cout << "Texto a codificar: ";
-    std::cin.ignore(); // Limpa o buffer de entrada
-    std::getline(std::cin, texto);
-    std::ranges::transform(texto, texto.begin(), ::toupper);
-    std::cout << "Texto codificado em Morse: ";
-    for (const char c: texto) {
-        if (c >= 'A' && c <= 'Z') {
-            std::cout << codigos[c - 'A'] << " ";
-        } else if (c == ' ') {
-            std::cout << "/ ";
+namespace {
+    void codificarMorse() {
+        std::string texto;
+        std::cout << "Texto a codificar: ";
+        std::cin.ignore(); // Limpa o buffer de entrada
+        std::getline(std::cin, texto);
+        std::ranges::transform(texto, texto.begin(), ::toupper);
+        std::cout << "Texto codificado em Morse: ";
+        for (const char c: texto) {
+            if (c >= 'A' && c <= 'Z') {
+                std::cout << codigos[c - 'A'] << " ";
+            } else if (c == ' ') {
+                std::cout << "/ ";
+            }
         }
+        std::cout << std::endl;
     }
-    std::cout << std::endl;
-}
 
-void decodificarMorse() {
-    std::string morse;
-    std::cout << "Texto para decodificar: ";
-    std::cin.ignore(); // Limpa o buffer de entrada
-    std::getline(std::cin, morse);
-    std::cout << "Texto decodificado: ";
-    std::string codigoAtual;
+    void decodificarMorse() {
+        std::string morse;
+        std::cout << "Texto para decodificar: ";
+        std::cin.ignore(); // Limpa o buffer de entrada
+        std::getline(std::cin, morse);
+        std::cout << "Texto decodificado: ";
+        std::string codigoAtual;
 
-    // percorre a string morse caractere por caractere e separa os códigos por espaços
-    // quando encontra um espaço, verifica o código atual e imprime a letra correspondente
-    for (size_t i = 0; i <= morse.length(); ++i) {
-        if (i < morse.length() && morse[i] != ' ') {
-            codigoAtual += morse[i];
-        } else {
-            if (codigoAtual == "/") {
-                std::cout << " ";
+        // percorre a string morse caractere por caractere e separa os códigos por espaços
+        // quando encontra um espaço, verifica o código atual e imprime a letra correspondente
+        for (size_t i = 0; i <= morse.length(); ++i) {
+            if (i < morse.length() && morse[i] != ' ') {
+                codigoAtual += morse[i];
             } else {
-                for (size_t j = 0; j < 26; ++j) {
-                    if (codigoAtual == codigos[j]) {
-                        std::cout << static_cast<char>('A' + j);
-                        break;
+                if (codigoAtual == "/") {
+                    std::cout << " ";
+                } else {
+                    for (size_t j = 0; j < 26; ++j) {
+                        if (codigoAtual == codigos[j]) {
+                            std::cout << static_cast<char>('A' + j);
+                            break;
+                        }
                     }
                 }
+                codigoAtual.clear();
             }
-            codigoAtual.clear();
         }
+        std::cout << std::endl;
     }
-    std::cout << std::endl;
 }
